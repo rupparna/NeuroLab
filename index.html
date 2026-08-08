@@ -62,7 +62,7 @@
           ctx.font = "12px Arial";
           ctx.fillText(Math.round(neuron.voltage) + " mV", neuron.x - 15, neuron.y -35);
         }
-        
+
         function drawNetwork() {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           
@@ -77,8 +77,29 @@
             ctx.stroke();
           }
           for (let i = 0; i < neurons.length; i++){
-            drawNeuron(neurons[i]);
-          }
+            let n = neurons[i];
+
+            if (n.voltage > -70) {
+              n.voltage -= 0.1; 
+            } else if (n.voltage < -70) {
+              n.voltage += 0.5; 
+            }
+
+            if (n.voltage >= -55 && n.isFiring === 0){
+              n.isFiring = 20; 
+              n.voltage = -90;
+              
+              if (i + 1 < neurons.length) {
+                pulses.push({ 
+                  fromIndex: i,
+                  toIndex: i + 1,
+                  progress: 0
+              
+                });
+              }
+            }
+            drawNeuron(n);
+            }
           for(let i = pulses.length - 1; i >= 0; i--){
             let p=pulses[i];
             let start=neurons[p.fromIndex];
@@ -98,6 +119,7 @@
         ctx.shadowBlur = 0;
 
         if (p.progress >= 1) {
+              end.voltage += 20; 
               end.isFiring = 20; 
               pulses.splice(i, 1);
             }
@@ -128,7 +150,8 @@
       drawNetwork();
       requestAnimationFrame(loop);
     }
-    loop();
+    loop(); 
+    
   </script>
     </body>
     </html>
