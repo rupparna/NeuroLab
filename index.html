@@ -97,7 +97,12 @@
           const clickY = event.clientY - rect.top;
 
          neurons.push({ x: clickX, y: clickY });
-         drawNetwork();
+         function loop() {
+          drawNetwork();
+          requestAnimationFrame(loop);
+        }
+        loop();
+        
     });
 
      neurons.push({ x: 300, y: 200 });
