@@ -42,16 +42,21 @@
         const ctx = canvas.getContext("2d");
         let neurons = [];
         let pulses = [];
-        function drawNeuron(x, y) {
+        function drawNeuron(neuron) {
           ctx.beginPath();
-          ctx.arc(x, y, 25, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(0, 243, 255, 0.2)";
+          ctx.arc(neuron.x, neuron.y, 25, 0, Math.PI * 2);
+          
+          ctx.fillStyle = neuron.isFiring > 0 ? "rgba(255, 255, 255, 0.6)" : "rgba(0, 243, 255, 0.2)";
           ctx.fill();
 
           ctx.beginPath();
-          ctx.arc(x, y, 12, 0, Math.PI * 2);
-          ctx.fillStyle = "#00f3ff";
-          ctx.fill()
+          ctx.arc(neuron.x, neuron.y, 12, 0, Math.PI * 2);
+          // Make the core white if firing
+          ctx.fillStyle = neuron.isFiring > 0 ? "#ffffff" : "#00f3ff";
+          ctx.fill();
+          
+          
+          if (neuron.isFiring > 0) neuron.isFiring -= 1;
         }
         function drawNetwork() {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -66,14 +71,14 @@
             ctx.lineWidth = 2;
             ctx.stroke();
           }
-          for (let i=0; i<neurons.length; i++){
-            drawNeuron(neurons[i].x, neurons[i].y);
+          for (let i = 0; i < neurons.length; i++){
+            drawNeuron(neurons[i]);
           }
-          for(let i=0 = pulses.length - 1; i >= 0; i--){
+          for(let i = pulses.length - 1; i >= 0; i--){
             let p=pulses[i];
             let start=neurons[p.fromIndex];
             let end=neurons[p.toIndex];
-        }
+        
 
         p.progress += 0.02;
         let currentX = start.x + (end.x - start.x) * p.progress;
@@ -88,25 +93,37 @@
         ctx.shadowBlur = 0;
 
         if (p.progress >= 1) {
-          pulses.splice(i, 1);
-        }
+              end.isFiring = 20; 
+              pulses.splice(i, 1);
+            }
       }
+    }
         canvas.addEventListener('click', function(event) {
           const rect = canvas.getBoundingClientRect();
           const clickX = event.clientX - rect.left;
           const clickY = event.clientY - rect.top;
 
          neurons.push({ x: clickX, y: clickY });
+         if (neurons.length > 1) {
+            pulses.push({ 
+              fromIndex: neurons.length - 2,
+              toIndex: neurons.length - 1,
+              progress: 0
+            });
+          }
          function loop() {
           drawNetwork();
           requestAnimationFrame(loop);
         }
-        loop();
-        
-    });
+       });
 
-     neurons.push({ x: 300, y: 200 });
+    neurons.push({ x: 300, y: 200 });
+    
+    function loop() {
       drawNetwork();
+      requestAnimationFrame(loop);
+    }
+    loop();
   </script>
     </body>
     </html>
