@@ -41,6 +41,7 @@
         const canvas = document.getElementById('lab-screen');
         const ctx = canvas.getContext("2d");
         let neurons = [];
+        let pulses = [];
         function drawNeuron(x, y) {
           ctx.beginPath();
           ctx.arc(x, y, 25, 0, Math.PI * 2);
@@ -68,17 +69,39 @@
           for (let i=0; i<neurons.length; i++){
             drawNeuron(neurons[i].x, neurons[i].y);
           }
+          for(let i=0 = pulses.length - 1; i >= 0; i--){
+            let p=pulses[i];
+            let start=neurons[p.fromIndex];
+            let end=neurons[p.toIndex];
         }
 
+        p.progress += 0.02;
+        let currentX = start.x + (end.x - start.x) * p.progress;
+        let currentY = start.y + (end.y - start.y) * p.progress;
+
+        ctx.beginPath();
+        ctx.arc(currentX, currentY, 6, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = "#00f3ff";
+        ctx.shadowBlur = 15;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        if (p.progress >= 1) {
+          pulses.splice(i, 1);
+        }
+      }
         canvas.addEventListener('click', function(event) {
           const rect = canvas.getBoundingClientRect();
           const clickX = event.clientX - rect.left;
           const clickY = event.clientY - rect.top;
 
-         drawNeuron(clickX, clickY);
+         neurons.push({ x: clickX, y: clickY });
+         drawNetwork();
     });
 
-    drawNeuron(300, 200);
+     neurons.push({ x: 300, y: 200 });
+      drawNetwork();
   </script>
     </body>
     </html>
