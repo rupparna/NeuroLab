@@ -7,3 +7,64 @@
       body {
         margin: 0;
         background-color: #0b0f19;
+        color: #00f3ff;
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      h1{
+        margin-top: 20px;
+        letter-spacing: 2px;
+
+      }
+
+      #lab-screen{
+      background-color: #111827;
+      border: 2px solid #00f3ff;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+      margin-top: 20px;
+      cursor: pointer;
+      }
+      p {
+      color: #94a3b8;
+      font-size: 14px;
+    }
+    </style>
+    </head>
+    <body>
+      
+      <h1> NEUROLAB//SIMULATOR</h1>
+      <p>Click anywhere inside the box to spawn a neuron </p>
+      <canvas id="lab-screen" width="600" height="400"></canvas>
+
+      <script>
+        const canvas = document.getElementById('lab-screen');
+        const ctx = canvas.getContext("2d");
+        function drawNeuron(x, y) {
+          ctx.beginPath();
+          ctx.arc(x, y, 25, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(0, 243, 255, 0.2)";
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(x, y, 12, 0, Math.PI * 2);
+          ctx.fillStyle = "#00f3ff";
+          ctx.fill()
+        }
+
+        canvas.addEventListener('click', function(event) {
+          const rect = canvas.getBoundingClientRect();
+          const clickX = event.clientX - rect.left;
+          const clickY = event.clientY - rect.top;
+
+         drawNeuron(clickX, clickY);
+    });
+
+    drawNeuron(300, 200);
+  </script>
+    </body>
+    </html>
+       
+
+
+
