@@ -57,7 +57,12 @@
           
           
           if (neuron.isFiring > 0) neuron.isFiring -= 1;
+
+          ctx.fillStyle = "#94a3b8";
+          ctx.font = "12px Arial";
+          ctx.fillText(Math.round(neuron.voltage) + " mV", neuron.x - 15, neuron.y -35);
         }
+        
         function drawNetwork() {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           
@@ -103,7 +108,7 @@
           const clickX = event.clientX - rect.left;
           const clickY = event.clientY - rect.top;
 
-         neurons.push({ x: clickX, y: clickY });
+         neurons.push({ x: clickX, y: clickY, voltage: -70, isFiring: 0 });
          if (neurons.length > 1) {
             pulses.push({ 
               fromIndex: neurons.length - 2,
@@ -117,7 +122,7 @@
         }
        });
 
-    neurons.push({ x: 300, y: 200 });
+    neurons.push({ x: 300, y: 200, voltage: -70, isFiring: 0 });
     
     function loop() {
       drawNetwork();
