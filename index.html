@@ -59,18 +59,25 @@ let thresholdLimit = -55;
           ctx.beginPath();
           ctx.arc(neuron.x, neuron.y, 25, 0, Math.PI * 2);
           
-          ctx.fillStyle = neuron.isFiring > 0 ? "rgba(255, 255, 255, 0.6)" : "rgba(0, 243, 255, 0.2)";
-          ctx.fill();
+         ctx.fillStyle = neuron.isFiring > 0
+    ? "rgba(255, 255, 255, 0.6)"
+    : neuron.refractory > 0
+    ? "rgba(0, 243, 255, 0.2)" : "";
+    ctx.fill();
 
-          ctx.beginPath();
-          ctx.arc(neuron.x, neuron.y, 12, 0, Math.PI * 2);
-          // Make the core white if firing
-          ctx.fillStyle = neuron.isFiring > 0 ? "#ffffff" : "#00f3ff";
-          ctx.fill();
-          
-          
-          if (neuron.isFiring > 0) neuron.isFiring -= 1;
+ctx.beginPath();
+ctx.arc(neuron.x, neuron.y, 12, 0, Math.PI * 2);
 
+ctx.fillStyle = neuron.isFiring > 0
+    ? "#ffffff"                  
+    : neuron.refractory > 0
+    ? "#a855f7"
+    : "#00f3ff";
+    
+ctx.fill();
+
+if (neuron.isFiring > 0) neuron.isFiring -= 1;
+if (neuron.refractory > 0) neuron.refractory -= 1;
           ctx.fillStyle = "#94a3b8";
           ctx.font = "12px Arial";
           ctx.fillText(Math.round(neuron.voltage) + " mV", neuron.x - 15, neuron.y -35);
@@ -143,7 +150,7 @@ let thresholdLimit = -55;
           const clickX = event.clientX - rect.left;
           const clickY = event.clientY - rect.top;
 
-         neurons.push({ x: clickX, y: clickY, voltage: -70, isFiring: 0 });
+         neurons.push({ x: clickX, y: clickY, voltage: -70, isFiring: 0 , refractory:0 });
          if (neurons.length > 1) {
             pulses.push({ 
               fromIndex: neurons.length - 2,
