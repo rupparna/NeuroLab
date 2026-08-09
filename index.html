@@ -33,9 +33,14 @@
     </head>
     <body>
       
-      <h1> NEUROLAB//SIMULATOR</h1>
-      <p>Click anywhere inside the box to spawn a neuron </p>
-      <canvas id="lab-screen" width="600" height="400"></canvas>
+     <div style="position: absolute; top: 20px; left: 20px; z-index: 10; background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(10px); border: 2px solid #00f3ff; border-radius: 12px; padding: 20px; width: 260px; box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);">
+        <h3 style="color: #00f3ff; margin-top: 0; margin-bottom: 12px; font-size: 16px; letter-spacing: 1px;">⚙️ LAB SETTINGS</h3>
+        <label style="display: flex; justify-content: space-between; font-size: 13px; color: #e2e8f0; margin-bottom: 6px;">
+          threshold: <span id="thresh-display" style="color: #00f3ff;">-55 mV</span>
+        </label>
+
+        
+
 
       <script>
         const canvas = document.getElementById('lab-screen');
@@ -82,8 +87,8 @@
             if (n.voltage > -70) {
               n.voltage -= 0.1; 
             } else if (n.voltage < -70) {
-              n.voltage += 0.5; 
-            }
+              n.voltage += 0.5; }
+            
 
             if (n.voltage >= -55 && n.isFiring === 0){
               n.isFiring = 20; 
