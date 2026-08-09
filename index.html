@@ -17,13 +17,15 @@
 
       }
 
-      #lab-screen{
-      background-color: #111827;
-      border: 2px solid #00f3ff;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
-      margin-top: 20px;
-      cursor: pointer;
+     #lab-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #111827;
+        cursor: pointer;
+        z-index: 1;
       }
       p {
       color: #94a3b8;
@@ -48,8 +50,11 @@
       <script>
         const canvas = document.getElementById('lab-screen');
         const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
         let neurons = [];
-        let pulses = [];
+let pulses = [];
+let thresholdLimit = -55;
         function drawNeuron(neuron) {
           ctx.beginPath();
           ctx.arc(neuron.x, neuron.y, 25, 0, Math.PI * 2);
@@ -93,7 +98,7 @@
               n.voltage += 0.5; }
             
 
-            if (n.voltage >= -55 && n.isFiring === 0){
+            if (n.voltage >= thresholdLimit && n.isFiring === 0){
               n.isFiring = 20; 
               n.voltage = -90;
               
@@ -146,10 +151,7 @@
               progress: 0
             });
           }
-         function loop() {
-          drawNetwork();
-          requestAnimationFrame(loop);
-        }
+         
        });
          const slider= document.getElementById('threshold-slider');
          const threshDisplay =document.getElementById('thresh-display');
@@ -159,8 +161,8 @@
       threshDisplay.innerText = thresholdLimit + " mV";
     });
     document.getElementById('button').addEventListener('click', () => {
-      neurons = [];
-      pulses = [];
+      neurons.length = 0;
+      pulses.length = 0;
     });
     neurons.push({ x: 300, y: 200, voltage: -70, isFiring: 0 });
     
