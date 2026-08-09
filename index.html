@@ -41,7 +41,10 @@
           threshold: <span id="thresh-display" style="color: #00f3ff;">-55 mV</span>
         </label>
         <input type="range" id="threshold-slider" min="-70" max="-40" value="-55" style="width: 100%; accent-color: #00f3ff; margin-bottom: 15px;">
-         <button id="button" style="width: 100%; background: rgba(0, 243, 255, 0.1); border: 1px solid #00f3ff; color: #00f3ff; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold;">Clear Canvas</button>
+        <button id="button" style="width: 100%; background: rgba(0, 243, 255, 0.1); border: 1px solid #00f3ff; color: #00f3ff; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 8px;">Clear Canvas</button>
+        <button id="stimulate-button" style="width: 100%; background: rgba(0, 243, 255, 0.1); border: 1px solid #00f3ff; color: #00f3ff; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 8px;">⚡ Stimulate</button>
+        <button id="pause-button" style="width: 100%; background: rgba(0, 243, 255, 0.1); border: 1px solid #00f3ff; color: #00f3ff; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 8px;">⏸ Pause</button>
+        <button id="reset-button" style="width: 100%; background: rgba(0, 243, 255, 0.1); border: 1px solid #00f3ff; color: #00f3ff; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold;">↺ Reset Voltages</button>
       </div>
       <canvas id="lab-screen"></canvas>
 
@@ -60,24 +63,23 @@ let thresholdLimit = -55;
           ctx.arc(neuron.x, neuron.y, 25, 0, Math.PI * 2);
           
          ctx.fillStyle = neuron.isFiring > 0
-    ? "rgba(255, 255, 255, 0.6)"
-    : neuron.refractory > 0
-    ? "rgba(0, 243, 255, 0.2)" : "";
-    ctx.fill();
+            ? "rgba(255, 255, 255, 0.6)"
+            : neuron.refractory > 0
+              ? "rgba(168, 85, 247, 0.25)"
+              : "rgba(0, 243, 255, 0.2)";
+          ctx.fill();
 
-ctx.beginPath();
-ctx.arc(neuron.x, neuron.y, 12, 0, Math.PI * 2);
+          ctx.beginPath();
+          ctx.arc(neuron.x, neuron.y, 12, 0, Math.PI * 2);
+          ctx.fillStyle = neuron.isFiring > 0
+            ? "#ffffff"
+            : neuron.refractory > 0
+              ? "#a855f7"
+              : "#00f3ff";
+          ctx.fill();
 
-ctx.fillStyle = neuron.isFiring > 0
-    ? "#ffffff"                  
-    : neuron.refractory > 0
-    ? "#a855f7"
-    : "#00f3ff";
-    
-ctx.fill();
-
-if (neuron.isFiring > 0) neuron.isFiring -= 1;
-if (neuron.refractory > 0) neuron.refractory -= 1;
+          if (neuron.isFiring > 0) neuron.isFiring -= 1;
+          if (neuron.refractory > 0) neuron.refractory -= 1;
           ctx.fillStyle = "#94a3b8";
           ctx.font = "12px Arial";
           ctx.fillText(Math.round(neuron.voltage) + " mV", neuron.x - 15, neuron.y -35);
@@ -105,10 +107,10 @@ if (neuron.refractory > 0) neuron.refractory -= 1;
               n.voltage += 0.5; }
             
 
-            if (n.voltage >= thresholdLimit && n.isFiring === 0){
-              n.isFiring = 20; 
-              n.voltage = -90;
-              
+            if (n.voltage >= thresholdLimit && n.isFiring === 0 && n.refractory === 0){
+                       n.isFiring= 20;
+                       n.refractory = 25;
+                       n.voltage= -90;    
               if (i + 1 < neurons.length) {
                 pulses.push({ 
                   fromIndex: i,
@@ -138,9 +140,10 @@ if (neuron.refractory > 0) neuron.refractory -= 1;
         ctx.fill();
         ctx.shadowBlur = 0;
 
-        if (p.progress >= 1) {
-              end.voltage += 20; 
-              end.isFiring = 20; 
+       if (p.progress >= 1) {
+              if (end.refractory === 0) {
+                end.voltage += 20;
+              }
               pulses.splice(i, 1);
             }
       }
@@ -150,7 +153,7 @@ if (neuron.refractory > 0) neuron.refractory -= 1;
           const clickX = event.clientX - rect.left;
           const clickY = event.clientY - rect.top;
 
-         neurons.push({ x: clickX, y: clickY, voltage: -70, isFiring: 0 , refractory:0 });
+       neurons.push({ x: clickX, y: clickY, voltage: -70, isFiring: 0, refractory: 0 });
          if (neurons.length > 1) {
             pulses.push({ 
               fromIndex: neurons.length - 2,
@@ -170,15 +173,34 @@ if (neuron.refractory > 0) neuron.refractory -= 1;
     document.getElementById('button').addEventListener('click', () => {
       neurons.length = 0;
       pulses.length = 0;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
     });
-    neurons.push({ x: 300, y: 200, voltage: -70, isFiring: 0 });
+    document.getElementById('stimulate-button').addEventListener('click', () => {
+      if (neurons.length === 0) return;
+      neurons[0].voltage = thresholdLimit;
+    });
+
+    document.getElementById('reset-button').addEventListener('click', () => {
+      neurons.forEach(n => {
+        n.voltage = -70;
+        n.isFiring = 0;
+        n.refractory = 0;
+      });
+      pulses.length = 0;
+    });
+
+    let isPaused = false;
+    document.getElementById('pause-button').addEventListener('click', function () {
+      isPaused = !isPaused;
+      this.innerText = isPaused ? "▶ Resume" : "⏸ Pause";
+    });
+    neurons.push({ x: 300, y: 200, voltage: -70, isFiring: 0, refractory: 0 });
     
     function loop() {
-      drawNetwork();
+      if (!isPaused) drawNetwork();
       requestAnimationFrame(loop);
     }
-    loop(); 
-    
+    loop();
   </script>
     </body>
     </html>
