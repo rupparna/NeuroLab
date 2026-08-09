@@ -38,8 +38,11 @@
         <label style="display: flex; justify-content: space-between; font-size: 13px; color: #e2e8f0; margin-bottom: 6px;">
           threshold: <span id="thresh-display" style="color: #00f3ff;">-55 mV</span>
         </label>
+        <input type="range" id="threshold-slider" min="-70" max="-40" value="-55" style="width: 100%; accent-color: #00f3ff; margin-bottom: 15px;">
+         <button id="button" style="width: 100%; background: rgba(0, 243, 255, 0.1); border: 1px solid #00f3ff; color: #00f3ff; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold;">Clear Canvas</button>
+      </div>
+      <canvas id="lab-screen"></canvas>
 
-        
 
 
       <script>
@@ -148,7 +151,17 @@
           requestAnimationFrame(loop);
         }
        });
+         const slider= document.getElementById('threshold-slider');
+         const threshDisplay =document.getElementById('thresh-display');
 
+         slider.addEventListener('input', (event)=> {
+      thresholdLimit = parseInt(event.target.value);
+      threshDisplay.innerText = thresholdLimit + " mV";
+    });
+    document.getElementById('button').addEventListener('click', () => {
+      neurons = [];
+      pulses = [];
+    });
     neurons.push({ x: 300, y: 200, voltage: -70, isFiring: 0 });
     
     function loop() {
